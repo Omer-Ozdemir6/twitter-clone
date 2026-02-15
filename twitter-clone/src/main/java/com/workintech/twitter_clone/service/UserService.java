@@ -1,28 +1,22 @@
 package com.workintech.twitter_clone.service;
 
 
-import com.workintech.twitter_clone.entity.User;
-import com.workintech.twitter_clone.repository.UserRepository;
-import org.springframework.stereotype.Service;
+import com.workintech.twitter_clone.dto.request.UserRequestDto;
+import com.workintech.twitter_clone.dto.response.UserResponseDto;
 
-@Service
-public class UserService {
 
-    private final UserRepository userRepository;
+import java.util.List;
 
-    public UserService(UserRepository userRepository){
-        this.userRepository = userRepository;
-    }
 
-    public User registerUser(User user){
 
-        if (userRepository.findByUsername(user.getUserName()).isPresent()){
-            throw new RuntimeException("Bu kullanıcı adı zaten alınmış!");
-        }
-        return userRepository.save(user);
-    }
+public interface UserService {
 
-    public User findById(Long id){
-        return userRepository.findById(id).orElseThrow(()-> new RuntimeException("Kullanıcı bulunamadı!"));
-    }
+    List<UserResponseDto> getAll();
+    UserResponseDto findById(Long id);
+    UserResponseDto create(UserRequestDto userRequestDto);
+    UserResponseDto update(Long id, UserRequestDto userRequestDto);
+    void deleteById(Long id);
+
+    UserResponseDto findByUsername(String username);
+
 }
