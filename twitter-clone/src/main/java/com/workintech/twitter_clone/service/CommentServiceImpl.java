@@ -32,13 +32,14 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public CommentResponseDto create(CommentRequestDto commentRequestDto) {
+    public CommentResponseDto create(Long tweetId, CommentRequestDto commentRequestDto) {
+
         String loggedInUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(loggedInUsername)
                 .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
 
-        Tweet tweet = tweetRepository.findById(commentRequestDto.tweetId())
-                .orElseThrow(() -> new RuntimeException("Tweet bulunamadı: " + commentRequestDto.tweetId()));
+        Tweet tweet = tweetRepository.findById(tweetId)
+                .orElseThrow(() -> new RuntimeException("Tweet bulunamadı: " + tweetId));
 
         Comment comment = new Comment();
         comment.setContent(commentRequestDto.content());
@@ -47,7 +48,12 @@ public class CommentServiceImpl implements CommentService {
         tweet.addComment(comment);
 
         Comment savedComment = commentRepository.save(comment);
-        return new CommentResponseDto(savedComment.getId(), savedComment.getContent(), user.getUsername(), savedComment.getCreateAt());
+        return new CommentResponseDto(
+                savedComment.getId(),
+                savedComment.getContent(),
+                user.getUsername(),
+                savedComment.getCreateAt()
+        );
     }
 
     @Transactional

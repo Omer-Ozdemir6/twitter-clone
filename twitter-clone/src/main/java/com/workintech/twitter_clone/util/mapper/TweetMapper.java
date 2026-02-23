@@ -30,7 +30,7 @@ public class TweetMapper {
                 tweet.getCreateAt(),
                 commentDtos,
                 0,
-                false
+                false,tweet.getUser().getId()
         );
     }
     public Tweet toEntity(TweetRequestDto tweetRequestDto) {

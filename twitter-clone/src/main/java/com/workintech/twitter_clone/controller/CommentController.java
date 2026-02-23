@@ -14,13 +14,13 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
-    @PostMapping
-    public CommentResponseDto create(@RequestBody CommentRequestDto commentRequestDto) {
-        return commentService.create(commentRequestDto);
+    @PostMapping("/{id}")
+    public CommentResponseDto create(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto) {
+        return commentService.create(id, commentRequestDto);
     }
 
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public CommentResponseDto update(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto) {
         return commentService.update(id, commentRequestDto);
     }

@@ -50,7 +50,8 @@ public class TweetServiceImpl implements TweetService {
                     tempDto.createdAt(),
                     tempDto.comments(),
                     tweet.getLikes().size(),
-                    isLiked
+                    isLiked,
+                    tweet.getUser().getId()
             );
         }).toList();
     }
@@ -78,25 +79,27 @@ public class TweetServiceImpl implements TweetService {
         return tweetMapper.toResponseDto(tweet);
     }
 
-    @Override
     @Transactional
+    @Override
     public TweetResponseDto update(Long id, TweetPatchRequestDto tweetPatchRequestDto) {
-        Tweet tweetToUpdate = tweetRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tweet bulunamadı, id: " + id));
+        Tweet existingTweet = tweetRepository.findById(id)
+                .orElseThrow(() -> new TwitterException("Tweet bulunamadı! ID: " + id, HttpStatus.NOT_FOUND));
 
         String loggedInUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!tweetToUpdate.getUser().getUsername().equals(loggedInUsername)) {
-            throw new TwitterException("Bu tweeti düzenleme yetkiniz yok!", HttpStatus.FORBIDDEN);
+        if (!existingTweet.getUser().getUsername().equals(loggedInUsername)) {
+            throw new TwitterException("Sadece kendi tweetlerinizi güncelleyebilirsiniz!", HttpStatus.FORBIDDEN);
         }
 
-        if (tweetPatchRequestDto != null && tweetPatchRequestDto.content() != null) {
-            tweetToUpdate.setContent(tweetPatchRequestDto.content());
-        }
+        existingTweet.setContent(tweetPatchRequestDto.content());
 
-        Tweet savedTweet = tweetRepository.save(tweetToUpdate);
+
+        Tweet savedTweet = tweetRepository.save(existingTweet);
+
 
         return tweetMapper.toResponseDto(savedTweet);
     }
+
+
     @Override
     public TweetResponseDto replaceOrCreate(Long id, TweetRequestDto tweetRequestDto) {
         Tweet tweet = tweetMapper.toEntity(tweetRequestDto);
@@ -141,7 +144,7 @@ public class TweetServiceImpl implements TweetService {
                     return new TweetResponseDto(
                             temp.id(), temp.content(), temp.username(),
                             temp.createdAt(), temp.comments(),
-                            tweet.getLikes().size(), isLiked
+                            tweet.getLikes().size(), isLiked,tweet.getUser().getId()
                     );
                 }).toList();
     }

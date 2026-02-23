@@ -23,12 +23,12 @@ public class TweetController {
             return tweetService.getAll();
         }
 
-        @GetMapping("/{id}")
+        @GetMapping("findById/{id}")
     public TweetResponseDto findById(@PathVariable("id") Long id){
             return tweetService.findById(id);
         }
 
-        @GetMapping("/user/{userId}")
+    @GetMapping("/findByUserId/{userId}")
     public List<TweetResponseDto> findByUserId(@PathVariable("userId") Long userId){
             return tweetService.findByUserId(userId);
         }
